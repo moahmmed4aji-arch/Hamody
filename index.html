@@ -55,7 +55,9 @@
     <div id="quiz">
       <button id="startBtn">ابدا الأسئلة</button>
     </div>
-  </div>  <script>
+  </div><audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3"></audio> <audio id="wrongSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3"></audio>
+
+  <script>
     const quizData = [
       {q: "من هو بطل لعبة God of War؟", options: ["كراتوس", "دانتي", "ليون"], answer: 0},
       {q: "The Last of Us Part II شخصيتها الرئيسية؟", options: ["إيلي", "لارا", "آدا"], answer: 0},
@@ -80,10 +82,20 @@
     ];
 
     const quizEl = document.getElementById("quiz");
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
     let current = 0;
     let score = 0;
 
     document.getElementById("startBtn").addEventListener("click", startQuiz);
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
 
     function startQuiz() {
       current = 0;
@@ -97,16 +109,21 @@
         return;
       }
       const data = quizData[current];
+      let options = data.options.map((opt, i) => ({text: opt, index: i}));
+      options = shuffleArray(options);
+
       quizEl.innerHTML = `<h2>${data.q}</h2>`;
-      data.options.forEach((opt, i) => {
+      options.forEach(opt => {
         const btn = document.createElement("button");
-        btn.textContent = opt;
+        btn.textContent = opt.text;
         btn.onclick = () => {
-          if (i === data.answer) {
+          if (opt.index === data.answer) {
             btn.classList.add("correct");
+            correctSound.play();
             score++;
           } else {
             btn.classList.add("wrong");
+            wrongSound.play();
           }
           setTimeout(() => {
             current++;
